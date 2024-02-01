@@ -6,15 +6,12 @@ import es.netmind.mypersonalbankapi.modelos.clientes.Cliente;
 import es.netmind.mypersonalbankapi.modelos.prestamos.Prestamo;
 import es.netmind.mypersonalbankapi.persistencia.*;
 import es.netmind.mypersonalbankapi.utils.ClientesUtils;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.util.List;
@@ -27,7 +24,8 @@ public class ClientesController implements IClientesController {
     //private IClientesRepo clientesRepo = ClientesInMemoryRepo.getInstance();
     //private IClientesRepo clientesRepo = ClientesDBRepo.getInstance();   // RETO 4 - SGBD
     @Autowired // Para el bean clientesRepo no hace falta porque ya está definido en RepoConfig.java ?
-    private IClientesRepo clientesRepo;         // RETO 5 - SPRING
+    //private IClientesRepo clientesRepo;         // RETO 5 - SPRING
+    private IClientesRepoData clientesRepo;       // RETO 7 - SPRING-DATA
     private ICuentasRepo cuentasRepo = CuentasInMemoryRepo.getInstance();
     private IPrestamosRepo prestamosRepo = PrestamosInMemoryRepo.getInstance();
 
@@ -58,10 +56,8 @@ public class ClientesController implements IClientesController {
         System.out.println("───────────────────────────────────");
 
         try {
-            Cliente cl = clientesRepo.getClientById(uid);
+            Cliente cl = clientesRepo.findById(uid).orElseThrow(()->new ClienteNotFoundException());
             System.out.println(cl);
-        } catch (ClienteException e) {
-            System.out.println("Cliente NO encontrado 😞! \nCode: " + e.getCode());
         } catch (ClienteNotFoundException e) {
             System.out.println("Cliente NO encontrado 😞!");
         } catch (Exception e) {
@@ -70,12 +66,13 @@ public class ClientesController implements IClientesController {
 
     }
 
+    @Transactional(propagation = Propagation.MANDATORY)
     public void add(String[] args) {
         System.out.println("\nAñadiendo cliente");
         System.out.println("───────────────────────────────────");
         try {
             Cliente cl = ClientesUtils.extractClientFromArgsForCreate(args);
-            clientesRepo.addClient(cl);
+            clientesRepo.save(cl);
             System.out.println("Cliente añadido: " + cl + " 🙂");
             mostrarLista();
         } catch (ClienteException e) {
@@ -83,7 +80,8 @@ public class ClientesController implements IClientesController {
         } catch (DateTimeException e) {
             System.out.println("⚠ LAS FECHAS DEBEN TENER EL FORMATO yyyy-mm-dd, por ejemplo 2023-12-01 ⚠");
         } catch (Exception e) {
-            System.out.println("Oops ha habido un problema, inténtelo más tarde 😞!");
+            //System.out.println("Oops ha habido un problema, inténtelo más tarde 😞!");
+            System.out.println("Cliente NO válido 😞!");
             e.printStackTrace();
         }
 
@@ -94,12 +92,9 @@ public class ClientesController implements IClientesController {
         System.out.println("───────────────────────────────────");
 
         try {
-            Cliente cl = clientesRepo.getClientById(uid);
-            boolean borrado = clientesRepo.deleteClient(cl);
-            if (borrado) {
-                System.out.println("Cliente borrado 🙂!!");
-                this.mostrarLista();
-            } else System.out.println("Cliente NO borrado 😞!! Consulte con su oficina.");
+            clientesRepo.deleteById(uid);
+            System.out.println("Cliente borrado 🙂!!");
+            this.mostrarLista();
         } catch (ClienteException e) {
             System.out.println("Cliente NO encontrado 😞! \nCode: " + e.getCode());
         } catch (Exception e) {
@@ -113,10 +108,10 @@ public class ClientesController implements IClientesController {
         System.out.println("───────────────────────────────────");
 
         try {
-            Cliente cl = clientesRepo.getClientById(uid);
+            Cliente cl = clientesRepo.findClienteById(uid);
             System.out.println("cl.getClass():" + cl.getClass() + " " + cl);
             ClientesUtils.updateClientFromArgs(cl, args);
-            clientesRepo.updateClient(cl);
+            clientesRepo.save(cl);
             System.out.println("Cliente actualizado 🙂!!");
             System.out.println(cl);
             this.mostrarLista();
@@ -130,39 +125,12 @@ public class ClientesController implements IClientesController {
         }
     }
 
-    public void connectClientController() {
-        try {
-            clientesRepo.connectClientRepo();
-        } catch (Exception e) {
-            System.out.println("ERROR en connectClientRepo");
-            e.printStackTrace();
-        }
-    }
-
-    public void commitClientController() {
-        try {
-            clientesRepo.commitClientRepo();
-        } catch (Exception e) {
-            System.out.println("ERROR en commitClientController");
-            e.printStackTrace();
-        }
-    }
-
-    public void rollbackClientController() {
-        try {
-            clientesRepo.rollbackClientRepo();
-        } catch (Exception e) {
-            System.out.println("ERROR en rollbackClientController");
-            e.printStackTrace();
-        }
-    }
-
     public void evaluarPrestamo(Integer uid, Double cantidad) {
         System.out.println("\nEvaluando préstamos de " + cantidad + " EUR para el  cliente: " + uid);
         System.out.println("───────────────────────────────────");
 
         try {
-            Cliente cliente = clientesRepo.getClientById(uid);
+            Cliente cliente = clientesRepo.findClienteById(uid);
             System.out.println("Saldo total del cliente: " + cliente.obtenerSaldoTotal());
             int numPrestamos = cliente.getPrestamos() != null ? cliente.getPrestamos().size() : 0;
             System.out.println("Número total de préstamos del cliente: " + numPrestamos);
@@ -183,7 +151,7 @@ public class ClientesController implements IClientesController {
 
     }
 
-    public void setClientesRepo(IClientesRepo clientesRepo) {
+    public void setClientesRepo(IClientesRepoData clientesRepo) {
         this.clientesRepo = clientesRepo;
     }
 }

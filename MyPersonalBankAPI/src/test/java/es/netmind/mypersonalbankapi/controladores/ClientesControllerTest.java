@@ -4,12 +4,15 @@ import es.netmind.mypersonalbankapi.config.SpringConfig;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Propagation;
 
+import javax.transaction.Transactional;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
@@ -19,9 +22,8 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
-//@ContextConfiguration(classes = {RepoConfig.class, ControllerConfig.class})
 @ContextConfiguration(classes = {SpringConfig.class})
-//@ActiveProfiles("default") // Ejecuta el perfil "default" aunque esté comentado.
+@EnableAutoConfiguration
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class ClientesControllerTest {
 
@@ -44,7 +46,7 @@ class ClientesControllerTest {
 
     @BeforeEach
     public void setUpStreams() {
-        clienteControl.connectClientController();
+        //clienteControl.connectClientController();
         System.setOut(new PrintStream(outContent));
         System.setErr(new PrintStream(errContent));
     }
@@ -60,7 +62,7 @@ class ClientesControllerTest {
         //then
         //assertEquals(3, long1);
         //assertThat(outContent.toString(), containsString("Personal{dni='12345678J'} Cliente{id=1, nombre='Juan Juanez', email='jj@j.com', direccion='Calle JJ 1', alta=2023-10-23, activo=true, moroso=false, cuentas=[Cuenta{id=1, fechaCreacion=2023-10-23, saldo=100.0, transacciones=null, interes=1.1, comision=0.2}, Cuenta{id=4, fechaCreacion=2023-10-23, saldo=300.0, transacciones=null, interes=1.1, comision=0.2}], prestamos=[Prestamo{id=1, fechaConcesion=2023-10-23, monto=1000.0, saldo=1000.0, pagos=null, moras=null, interes=4, interesMora=2, moroso=false, liquidado=false}]}"));
-        assertThat(outContent.toString(), containsString("Personal{dni='12345678Z'} Cliente{id=1, nombre='Juan Juanez', email='jj@j.com', direccion='C/Huelva 13, Barcelona', alta=2023-10-18, activo=true, moroso=false, cuentas=null, prestamos=null}"));
+        assertThat(outContent.toString(), containsString("Personal{dni='12345678Z'} Cliente{id=1, nombre='Juan Juanez', email='jj@j.com', direccion='C/Huelva 13, Barcelona', alta=2023-10-18, activo=true, moroso=false, cuentas=null, prestamos=[Prestamo{id=1, fechaConcesion=2023-11-07, monto=1000.0, saldo=1000.0, pagos=null, moras=null, interes=4, interesMora=2, moroso=false, liquidado=false}]}"));
     }
 
     @Test
@@ -94,7 +96,7 @@ class ClientesControllerTest {
                 "12345678Z"
         };
         clienteControl.actualizar(1, datos);
-        clienteControl.commitClientController();
+        //clienteControl.commitClientController();
 
         assertFalse(outContent.toString().contains("nombre='Francisco Lopez'"));
     }
@@ -112,7 +114,7 @@ class ClientesControllerTest {
                 "12345678Z"
         };
         clienteControl.actualizar(1, datos);
-        clienteControl.rollbackClientController();
+        //clienteControl.rollbackClientController();
 
         assertThat(outContent.toString(), containsString("Carlos Lopez"));
     }
@@ -139,7 +141,7 @@ class ClientesControllerTest {
         int long1 = clienteControl.numeroClientes();
         //when
         clienteControl.mostrarLista();
-        clienteControl.rollbackClientController();
+        //clienteControl.rollbackClientController();
         //then
         assertEquals(3, long1);
         //Ponemos 3 en lugar de 0 porque los 3 usuarios iniciales de la base de datos tienen foreign key.
@@ -147,6 +149,7 @@ class ClientesControllerTest {
 
     @Test
     @Order(7)
+    @Transactional
     void dadoUsuarioQuiereAltaCliente_cuandoDatosOK_entoncesAltaOK() {
         String[] datos = {
                 "personal",

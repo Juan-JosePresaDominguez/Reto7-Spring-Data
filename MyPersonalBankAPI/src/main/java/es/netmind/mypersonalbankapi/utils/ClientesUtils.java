@@ -1,5 +1,7 @@
 package es.netmind.mypersonalbankapi.utils;
 
+import es.netmind.mypersonalbankapi.exceptions.ClienteException;
+import es.netmind.mypersonalbankapi.exceptions.ErrorCode;
 import es.netmind.mypersonalbankapi.modelos.clientes.Cliente;
 import es.netmind.mypersonalbankapi.modelos.clientes.ClientesFactory;
 import es.netmind.mypersonalbankapi.modelos.clientes.Empresa;
@@ -39,8 +41,9 @@ public class ClientesUtils {
             params.put("unidadesNegocio", argsLength > 8 ? args[8].split(",") : null);
             cl = ClientesFactory.create("empresa", params);
         }
-
-        return cl;
+        if (cl.validar()) return cl;
+        else throw new Exception();
+        //return cl;
     }
 
     public static Cliente updateClientFromArgs(Cliente cliente, String[] args) throws Exception {

@@ -10,7 +10,9 @@ public interface IClientesRepoData extends JpaRepository<Cliente, Integer> {
 
     public Cliente findClienteById(Integer id) throws Exception;
 
-    //@Query("SELECT c FROM Cliente c WHERE c.id LIKE *")
+    //MÉTODOS EQUIVALENTES (no haría falta definirlos)
+    public List<Cliente> findAll();
+
     @Query("SELECT c FROM Cliente c")
     public List<Cliente> getAll() throws Exception;
 }

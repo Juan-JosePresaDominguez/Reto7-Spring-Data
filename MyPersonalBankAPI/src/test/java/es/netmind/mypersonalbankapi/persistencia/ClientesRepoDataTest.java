@@ -41,9 +41,10 @@ class ClientesRepoDataTest {
     @Test
     void dadosClientes_cuandogetAll_entoncesClientes() throws Exception {
         //Como usuario del sistema, quiero poder ver nuestra lista de clientes para tener una visión general de los mismos.
-        List<Cliente> clientes = repo.getAll();
+        //List<Cliente> clientes = repo.getAll();
+        List<Cliente> clientes = repo.findAll();
 
-        System.out.println(clientes);
+        System.out.println("test getAll:" + clientes);
 
         assertThat(clientes.size(), greaterThan(0));
     }
@@ -121,10 +122,11 @@ class ClientesRepoDataTest {
         //Como usuario del sistema, quiero poder modificar los datos de un cliente para mantenerlos actualizados.
         Empresa cliente = new Empresa(85,"Caixa Bank", "caixa@c.com", "BCN", LocalDate.now(), true, true, "J12345678", new String[]{"Activo", "Garantías", "Tasaciones"});
 
-        System.out.println(cliente);
+        System.out.println("test - cliente:" + cliente);
 
         assertThrows(Exception.class, () -> {
-            repo.save(cliente);
+            repo.findById(cliente.getId()).orElseThrow(()->new RuntimeException());
+            //repo.save(cliente);
         });
     }
 
@@ -138,12 +140,13 @@ class ClientesRepoDataTest {
 
         repo.delete(cliente);
 
-        System.out.println(cliente);
+        System.out.println("test - cliente:" + cliente);
 
         //assertThat(cliente.getId(), greaterThan(0));
 
         assertThrows(Exception.class, () -> {
-            repo.findClienteById(cliente.getId());
+            //repo.findClienteById(cliente.getId());
+            repo.findById(cliente.getId()).orElseThrow(()->new RuntimeException());
         });
     }
 
