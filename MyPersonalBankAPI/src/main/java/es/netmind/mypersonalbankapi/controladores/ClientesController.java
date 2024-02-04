@@ -87,6 +87,7 @@ public class ClientesController implements IClientesController {
 
     }
 
+    @Transactional(propagation = Propagation.MANDATORY)
     public void eliminar(Integer uid) {
         System.out.println("\nBorrando cliente: " + uid);
         System.out.println("───────────────────────────────────");
@@ -103,6 +104,7 @@ public class ClientesController implements IClientesController {
 
     }
 
+    @Transactional(propagation = Propagation.MANDATORY)
     public void actualizar(Integer uid, String[] args) {
         System.out.println("\nActualizando cliente: " + uid);
         System.out.println("───────────────────────────────────");

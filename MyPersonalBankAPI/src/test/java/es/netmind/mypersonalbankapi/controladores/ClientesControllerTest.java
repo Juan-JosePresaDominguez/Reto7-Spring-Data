@@ -85,6 +85,7 @@ class ClientesControllerTest {
 
     @Test
     @Order(3)
+    @Transactional
     void dadoUsuarioQuiereModificarCliente_cuandoDatosNOK_entoncesModificacionNOK() {
         String[] datos = {
                 "Francisco Lopez",
@@ -103,6 +104,7 @@ class ClientesControllerTest {
 
     @Test
     @Order(4)
+    @Transactional
     void dadoUsuarioQuiereModificarCliente_cuandoDatosOK_entoncesModificacionOK() {
         String[] datos = {
                 "Carlos Lopez",
@@ -133,9 +135,10 @@ class ClientesControllerTest {
 
     @Test
     @Order(6)
+    @Transactional
     void dadoUsuarioQuiereConsultar_cuandoNoHayClientes_entoncesObtieneListaVacia() throws Exception {
-        //given
-        for (int i = 1; i < 100; i++) {
+        //No borramos los 3 primeros - error por integridad referencial
+        for (int i = 4; i < 100; i++) {
             clienteControl.eliminar(i);
         }
         int long1 = clienteControl.numeroClientes();
@@ -167,6 +170,7 @@ class ClientesControllerTest {
 
     @Test
     @Order(8)
+    @Transactional
     void dadoUsuarioQuiereAltaCliente_cuandoDatosNOK_entoncesAltaNOK() throws Exception {
         String[] datos = {
                 "empresa",
