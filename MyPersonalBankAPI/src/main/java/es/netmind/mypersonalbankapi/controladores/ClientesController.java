@@ -66,7 +66,7 @@ public class ClientesController implements IClientesController {
 
     }
 
-    @Transactional(propagation = Propagation.MANDATORY)
+    @Transactional(propagation = Propagation.REQUIRED)
     public void add(String[] args) {
         System.out.println("\nAñadiendo cliente");
         System.out.println("───────────────────────────────────");
@@ -87,7 +87,7 @@ public class ClientesController implements IClientesController {
 
     }
 
-    @Transactional(propagation = Propagation.MANDATORY)
+    @Transactional(propagation = Propagation.REQUIRED)
     public void eliminar(Integer uid) {
         System.out.println("\nBorrando cliente: " + uid);
         System.out.println("───────────────────────────────────");
@@ -95,16 +95,19 @@ public class ClientesController implements IClientesController {
         try {
             clientesRepo.deleteById(uid);
             System.out.println("Cliente borrado 🙂!!");
-            this.mostrarLista();
-        } catch (ClienteException e) {
-            System.out.println("Cliente NO encontrado 😞! \nCode: " + e.getCode());
+            //this.mostrarLista();
         } catch (Exception e) {
-            System.out.println("Oops ha habido un problema, inténtelo más tarde 😞!");
+            System.out.println("Cliente NO encontrado\n");
         }
+        //} catch (ClienteException e) {
+        //    System.out.println("Cliente NO encontrado 😞! \nCode: " + e.getCode());
+        //} catch (Exception e) {
+        //    System.out.println("Oops ha habido un problema, inténtelo más tarde 😞!");
+        //}
 
     }
 
-    @Transactional(propagation = Propagation.MANDATORY)
+    @Transactional(propagation = Propagation.REQUIRED)
     public void actualizar(Integer uid, String[] args) {
         System.out.println("\nActualizando cliente: " + uid);
         System.out.println("───────────────────────────────────");
@@ -116,7 +119,7 @@ public class ClientesController implements IClientesController {
             clientesRepo.save(cl);
             System.out.println("Cliente actualizado 🙂!!");
             System.out.println(cl);
-            this.mostrarLista();
+            //this.mostrarLista();
         } catch (ClienteException e) {
             System.out.println("Cliente NO encontrado 😞! \nCode: " + e.getCode());
         } catch (DateTimeException e) {

@@ -85,8 +85,7 @@ class ClientesControllerTest {
 
     @Test
     @Order(3)
-    @Transactional
-    void dadoUsuarioQuiereModificarCliente_cuandoDatosNOK_entoncesModificacionNOK() {
+    void dadoUsuarioQuiereModificarCliente_cuandoDatosNOK_entoncesModificacionNOK() throws Exception {
         String[] datos = {
                 "Francisco Lopez",
                 "emaile|gmail.com",
@@ -99,6 +98,7 @@ class ClientesControllerTest {
         clienteControl.actualizar(1, datos);
         //clienteControl.commitClientController();
 
+        clienteControl.mostrarLista();
         assertFalse(outContent.toString().contains("nombre='Francisco Lopez'"));
     }
 
@@ -138,6 +138,7 @@ class ClientesControllerTest {
     @Transactional
     void dadoUsuarioQuiereConsultar_cuandoNoHayClientes_entoncesObtieneListaVacia() throws Exception {
         //No borramos los 3 primeros - error por integridad referencial
+        //Como no existen hasta el 100, al fallar el borrado la transacción se marca para rollback
         for (int i = 4; i < 100; i++) {
             clienteControl.eliminar(i);
         }
@@ -170,7 +171,6 @@ class ClientesControllerTest {
 
     @Test
     @Order(8)
-    @Transactional
     void dadoUsuarioQuiereAltaCliente_cuandoDatosNOK_entoncesAltaNOK() throws Exception {
         String[] datos = {
                 "empresa",

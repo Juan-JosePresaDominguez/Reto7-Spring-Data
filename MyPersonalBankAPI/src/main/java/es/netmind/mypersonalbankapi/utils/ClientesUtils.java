@@ -46,38 +46,64 @@ public class ClientesUtils {
         //return cl;
     }
 
-    public static Cliente updateClientFromArgs(Cliente cliente, String[] args) throws Exception {
+    public static Cliente updateClientFromArgs(Cliente clienteBD, String[] args) throws Exception {
         // {nombre} {email} {direccion} {fechaAlta (yyyy-mm-dd)} {activo} {moroso} {dni/nif} {unidadesNegocio (opcional)}
 
         int argsLength = args.length;
 
         System.out.println("updateClientFromArgs");
-        String className = cliente.getClass().getName();
+        String className = clienteBD.getClass().getName();
 
         System.out.println("argsLength: " + argsLength);
         System.out.println("className: " + className);
-        System.out.println("Traza 1");
-        if (args[0] != null) cliente.setNombre(args[0]);
-        if (args[1] != null) cliente.setEmail(args[1]);
-        if (args[2] != null) cliente.setDireccion(args[2]);
-        if (args[3] != null) cliente.setAlta(LocalDate.parse(args[3]));
-        if (args[4] != null) cliente.setActivo(Boolean.valueOf(args[4]));
-        if (args[5] != null) cliente.setMoroso(Boolean.valueOf(args[5]));
 
-        System.out.println("Traza 2");
+        System.out.println("Traza 1");
         if (className.contains("modelos.clientes.Personal")) {
             System.out.println("Traza 3");
-            Personal per = (Personal) cliente;
-            if (args[6] != null) per.setDni(args[6]);
-            if (per.validar()) return per;
+            Personal per = (Personal) clienteBD;
+            Personal cliente = new Personal(per.getId(), per.getNombre(), per.getEmail(), per.getDireccion(), per.getAlta(), per.isActivo(), per.isMoroso(), per.getDni());
+            if (args[0] != null) cliente.setNombre(args[0]);
+            if (args[1] != null) cliente.setEmail(args[1]);
+            if (args[2] != null) cliente.setDireccion(args[2]);
+            if (args[3] != null) cliente.setAlta(LocalDate.parse(args[3]));
+            if (args[4] != null) cliente.setActivo(Boolean.valueOf(args[4]));
+            if (args[5] != null) cliente.setMoroso(Boolean.valueOf(args[5]));
+            if (args[6] != null) cliente.setDni(args[6]);
+            if (cliente.validar()) {
+                if (args[0] != null) per.setNombre(args[0]);
+                if (args[1] != null) per.setEmail(args[1]);
+                if (args[2] != null) per.setDireccion(args[2]);
+                if (args[3] != null) per.setAlta(LocalDate.parse(args[3]));
+                if (args[4] != null) per.setActivo(Boolean.valueOf(args[4]));
+                if (args[5] != null) per.setMoroso(Boolean.valueOf(args[5]));
+                if (args[6] != null) per.setDni(args[6]);
+                return per;
+            }
             else throw new Exception();
             //return per;
         } else {
             System.out.println("Traza 4");
-            Empresa emp = (Empresa) cliente;
-            if (args[6] != null) emp.setCif(args[6]);
-            if (argsLength > 7) emp.setUnidadesNegocio(args[7].split(","));
-            if (emp.validar()) return emp;
+            Empresa emp = (Empresa) clienteBD;
+            Empresa cliente = new Empresa(emp.getId(), emp.getNombre(), emp.getEmail(), emp.getDireccion(), emp.getAlta(), emp.isActivo(), emp.isMoroso(), emp.getCif(), emp.getUnidadesNegocio());
+            if (args[0] != null) cliente.setNombre(args[0]);
+            if (args[1] != null) cliente.setEmail(args[1]);
+            if (args[2] != null) cliente.setDireccion(args[2]);
+            if (args[3] != null) cliente.setAlta(LocalDate.parse(args[3]));
+            if (args[4] != null) cliente.setActivo(Boolean.valueOf(args[4]));
+            if (args[5] != null) cliente.setMoroso(Boolean.valueOf(args[5]));
+            if (args[6] != null) cliente.setCif(args[6]);
+            if (argsLength > 7) cliente.setUnidadesNegocio(args[7].split(","));
+            if (cliente.validar()) {
+                if (args[0] != null) emp.setNombre(args[0]);
+                if (args[1] != null) emp.setEmail(args[1]);
+                if (args[2] != null) emp.setDireccion(args[2]);
+                if (args[3] != null) emp.setAlta(LocalDate.parse(args[3]));
+                if (args[4] != null) emp.setActivo(Boolean.valueOf(args[4]));
+                if (args[5] != null) emp.setMoroso(Boolean.valueOf(args[5]));
+                if (args[6] != null) emp.setCif(args[6]);
+                if (argsLength > 7) emp.setUnidadesNegocio(args[7].split(","));
+                return emp;
+            }
             else throw new Exception();
             //return emp;
         }
